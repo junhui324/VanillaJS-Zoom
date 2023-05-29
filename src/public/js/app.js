@@ -83,6 +83,7 @@ function handleCameraClick() {
 async function handleCameraChange() {
   await getMedia(camerasSelect.value);
   if (myPeerConnection) {
+    //어차피 새로운 deviceId로 새로운 stream 만들기 때문에 아래와 같이 사용해도 된다.
     const videoTrack = myStream.getVideoTracks()[0];
     const videoSender = myPeerConnection
       .getSender()
@@ -150,7 +151,21 @@ socket.on('ice', (ice) => {
 // RTC Code
 
 function makeConnection() {
-  myPeerConnection = new RTCPeerConnection();
+  myPeerConnection = new RTCPeerConnection({
+    //구글에서 가져온 공짜 스턴서버.
+    //실제로 뭔가 제작할 땐 내 소유의 스턴서버를 돌려야함
+    iceServers: [
+      {
+        urls: [
+          'stun:stun.l.google.com:19302',
+          'stun:stun1.l.google.com:19302',
+          'stun:stun2.l.google.com:19302',
+          'stun:stun3.l.google.com:19302',
+          'stun:stun4.l.google.com:19302',
+        ],
+      },
+    ],
+  });
   myPeerConnection.addEventListener('icecandidate', handleIce);
   myPeerConnection.addEventListener('addstream', handleAddStream);
   myStream.getTracks().forEach((track) => {
